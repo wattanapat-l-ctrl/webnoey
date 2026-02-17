@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navWelcome = document.getElementById('navWelcome');
     const navAdmin = document.getElementById('navAdmin');
     const navLogoutAction = document.getElementById('navLogoutAction');
+    const searchInput = document.getElementById('searchInput');
     if (loggedInUser) {
         if (navLogin) navLogin.classList.add('d-none');
         if (navRegister) navRegister.classList.add('d-none');
@@ -34,7 +35,38 @@ document.addEventListener('DOMContentLoaded', () => {
             myCoursesModal.addEventListener('show.bs.modal', loadMyCourses);
         }
     }
-    // ฟังก์ชันดึงข้อมูลคอร์สที่ผู้ใช้สมัคร (อัปเดตเพิ่มปุ่มเข้าเรียน)
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase(); // รับค่าที่พิมพ์และแปลงเป็นตัวเล็ก
+            filterCourses(searchTerm);
+        });
+    }
+    async function filterCourses(term) {
+        const coursesGrid = document.getElementById('coursesGrid');
+        if (!coursesGrid) return;
+        const { data, error } = await supabaseClient.from('courses').select('*');
+        if (data) {
+            const filtered = data.filter(course => 
+                course.course_name.toLowerCase().includes(term)
+            );
+            if (filtered.length > 0) {
+                coursesGrid.innerHTML = filtered.map(course => `
+                    <div class="col-lg-4 col-md-6 mb-4 course-item">
+                        <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                            <div class="bg-primary text-white d-flex align-items-center justify-content-center" style="height: 160px; background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
+                                <i class="display-3">📖</i>
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold">${course.course_name}</h5>
+                                <button class="btn btn-primary w-100 rounded-pill mt-3" onclick="enrollCourse('${course.course_name}')">ลงทะเบียนเรียน</button>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            } else {
+                coursesGrid.innerHTML = `<div class="col-12 text-center py-5 text-muted"><h4>ไม่พบคอร์สเรียนที่คุณค้นหา</h4></div>`;
+            }
+        }
+    }
     async function loadMyCourses() {
         const listContainer = document.getElementById('myCoursesList');
         if (!listContainer || !loggedInUser) return;
