@@ -17,6 +17,7 @@
                 <div class="navbar-nav me-auto">
                     <a class="nav-link" href="index.html">หน้าหลัก</a>
                     <a class="nav-link" href="courses.html">สมัครคอร์สเรียน</a>
+                    <a class="nav-link" href="#contact">ติดต่อเรา</a>
                 </div>
                 <div class="navbar-nav align-items-center">
                     <a class="nav-link" href="login.html" id="navLogin">เข้าสู่ระบบ</a>
@@ -31,7 +32,7 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <!-- <div class="container mt-5">
         <h2 class="text-center mb-4">เลือกคอร์สเรียนที่คุณสนใจ</h2>
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -57,8 +58,36 @@
                 </div>
             </div>
         </div>
+    </div> -->
+
+    <div class="container mt-5">
+        <h2 class="fw-bold mb-4 text-center">คอร์スเรียนทั้งหมด</h2>
+        
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-6">
+                <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                    <span class="input-group-text bg-white border-0 ps-4">
+                        🔍
+                    </span>
+                    <input type="text" id="searchInput" class="form-control border-0 py-3" placeholder="ค้นหาชื่อคอร์สเรียนที่คุณสนใจ...">
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4" id="coursesGrid">
+            </div>
     </div>
 
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">© 2026 MyCourse - แพลตฟอร์มการเรียนรู้ออนไลน์ที่ดีที่สุดสำหรับคุณ</p>
+            <div class="mt-2">
+                <a href="#" class="text-white me-3 text-decoration-none">Facebook</a>
+                <a href="#" class="text-white me-3 text-decoration-none">Line</a>
+                <a href="#" class="text-white text-decoration-none">Twitter</a>
+            </div>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 </body>
