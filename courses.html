@@ -78,6 +78,78 @@
             </div>
     </div>
 
+    <div class="modal fade" id="enrollModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold">ยืนยันการลงทะเบียน</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-4">กรุณาตรวจสอบข้อมูลและกรอกเบอร์โทรศัพท์เพื่อใช้ในการติดต่อ</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">คอร์สที่เลือก:</label>
+                        <input type="text" id="modalCourseName" class="form-control bg-light" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">ชื่อ-นามสกุล:</label>
+                        <input type="text" id="modalUserFullname" class="form-control bg-light" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">อีเมล:</label>
+                        <input type="email" id="modalUserEmail" class="form-control bg-light" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-primary">เบอร์โทรศัพท์ (จำเป็น):</label>
+                        <input type="tel" id="modalUserPhone" class="form-control border-primary" placeholder="08x-xxx-xxxx" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" onclick="confirmEnroll()">ยืนยันการสมัคร</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="enrollModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-primary text-white border-0 py-3">
+                <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>ยืนยันการลงทะเบียน</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <label class="form-label small text-muted">วิชาที่คุณเลือก</label>
+                    <input type="text" id="modalCourseName" class="form-control bg-light border-0 fw-bold" readonly>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label small text-muted">ชื่อผู้สมัคร</label>
+                        <input type="text" id="modalUserFullname" class="form-control bg-light border-0" readonly>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small text-muted">อีเมลติดต่อ</label>
+                    <input type="email" id="modalUserEmail" class="form-control bg-light border-0" readonly>
+                </div>
+                <hr class="my-4">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">กรอกเบอร์โทรศัพท์ของคุณ <span class="text-danger">*</span></label>
+                    <input type="tel" id="modalUserPhone" class="form-control form-control-lg border-primary" placeholder="08x-xxx-xxxx" maxlength="10">
+                    <div class="form-text">เราจะใช้เบอร์นี้เพื่อแจ้งเตือนข้อมูลคอร์สเรียน</div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" onclick="confirmEnroll()">ยืนยันและสมัครเรียน</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
             <p class="mb-0">© 2026 MyCourse - แพลตฟอร์มการเรียนรู้ออนไลน์ที่ดีที่สุดสำหรับคุณ</p>
@@ -90,5 +162,6 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
