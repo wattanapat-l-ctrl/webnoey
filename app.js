@@ -252,6 +252,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ==========================================
+    // จัดการระบบตารางสมาชิก (admin.html)
+    // ==========================================
+    const registeredUsersTableBody = document.getElementById('registeredUsersTableBody');
+    const totalUsersCount = document.getElementById('totalUsersCount');
+    
+    if (registeredUsersTableBody) {
+        // ฟังก์ชันโหลดรายชื่อสมาชิกทั้งหมดจากตาราง users
+        window.loadRegisteredUsers = async function() {
+            try {
+                // ดึงข้อมูลจาก Supabase เรียงตาม ID
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                
+                registeredUsersTableBody.innerHTML = '';
+                
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    // อัปเดตตัวเลขจำนวนสมาชิกรวม
+                    if (totalUsersCount) totalUsersCount.textContent = `รวม ${data.length} บัญชี`;
+
+                    // วนลูปสร้างตาราง
+                    data.forEach(user => {
+                        // เช็คสิทธิ์เพื่อใส่ป้ายสีสวยๆ
+                        const roleBadge = user.role === 'admin' 
+                            ? '<span class="badge bg-danger">Admin</span>' 
+                            : '<span class="badge bg-secondary">User</span>';
+                        
+                        // เผื่อกรณีที่คุณยังไม่มีคอลัมน์ id ในตาราง users
+                        const userId = user.id ? user.id : '-';
+
+                        registeredUsersTableBody.innerHTML += `
+                            <tr>
+                                <td>${userId}</td>
+                                <td>${user.fullname}</td>
+                                <td>${user.username}</td>
+                                <td>${user.email}</td>
+                                <td>${roleBadge}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    registeredUsersTableBody.innerHTML = '<tr><td colspan="5" class="text-center">ยังไม่มีข้อมูลสมาชิก</td></tr>';
+                    if (totalUsersCount) totalUsersCount.textContent = '0 บัญชี';
+                }
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                registeredUsersTableBody.innerHTML = '<tr><td colspan="5" class="text-danger text-center">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
+            }
+        };
+
+        // เรียกใช้งานทันทีเมื่อโหลดหน้าแอดมิน
+        loadRegisteredUsers();
+    }
+
     // ป้องกันคนที่ไม่ใช่ Admin เข้าหน้า admin.html
     if (window.location.pathname.includes('admin.html')) {
         if (!loggedInUser || loggedInUser.role !== 'admin') {
