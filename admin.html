@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบหลังบ้าน (Admin) - MyCourse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">MyCourse Admin</a>
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="index.html">กลับหน้าหลัก (ฝั่งผู้ใช้)</a>
+                <a class="nav-link active" href="admin.html">ข้อมูลการสมัครทั้งหมด</a>
+            </div>
+        </div>
+    </nav>
+
+<div class="container mt-4 mb-5">
+        <h2 class="mb-4">แผงควบคุมสำหรับผู้ดูแลระบบ (Admin)</h2>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0" id="formTitle">เพิ่มบทเรียนใหม่</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="courseManageForm">
+                            <input type="hidden" id="editCourseId"> <div class="mb-3">
+                                <label for="inputCourseName" class="form-label">ชื่อบทเรียน</label>
+                                <input type="text" class="form-control" id="inputCourseName" required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100" id="saveCourseBtn">บันทึกบทเรียน</button>
+                            <button type="button" class="btn btn-secondary w-100 mt-2" id="cancelEditBtn" style="display: none;">ยกเลิกการแก้ไข</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">จัดการบทเรียน</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="10%">ID</th>
+                                    <th>ชื่อบทเรียน</th>
+                                    <th width="25%">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courseManageTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">รายชื่อผู้สมัครเรียนล่าสุด</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th>อีเมล</th>
+                            <th>คอร์สที่สมัคร</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>
