@@ -34,19 +34,34 @@ document.addEventListener('DOMContentLoaded', () => {
             myCoursesModal.addEventListener('show.bs.modal', loadMyCourses);
         }
     }
+    // ฟังก์ชันดึงข้อมูลคอร์สที่ผู้ใช้สมัคร (อัปเดตเพิ่มปุ่มเข้าเรียน)
     async function loadMyCourses() {
         const listContainer = document.getElementById('myCoursesList');
         if (!listContainer || !loggedInUser) return;
+
         listContainer.innerHTML = '<li class="list-group-item text-center py-3">กำลังโหลด...</li>';
+
         const { data, error } = await supabaseClient
             .from('enrollments')
             .select('course_name, enroll_date')
             .eq('email', loggedInUser.email);
+
         if (data && data.length > 0) {
             listContainer.innerHTML = data.map(item => `
                 <li class="list-group-item py-3">
-                    <div class="fw-bold text-primary">${item.course_name}</div>
-                    <small class="text-muted">วันที่สมัคร: ${new Date(item.enroll_date).toLocaleDateString('th-TH')}</small>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold text-primary">${item.course_name}</div>
+                            <small class="text-muted">วันที่สมัคร: ${new Date(item.enroll_date).toLocaleDateString('th-TH')}</small>
+                        </div>
+                        <div>
+                            <a href="https://meet.google.com/landing?hs=197&authuser=0" 
+                            target="_blank" 
+                            class="btn btn-sm btn-success rounded-pill px-3">
+                            เข้าเรียน
+                            </a>
+                        </div>
+                    </div>
                 </li>
             `).join('');
         } else {
