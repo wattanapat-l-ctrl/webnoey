@@ -171,6 +171,75 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ฟังก์ชันโหลดคอร์สเรียนแบบ Grid Block
+    // ตัวแปรสำหรับเก็บข้อมูลคอร์สทั้งหมดไว้กรองค้นหา
+    let allCourses = [];
+
+    window.loadCoursesGrid = async function() {
+        const coursesGrid = document.getElementById('coursesGrid');
+        const searchInput = document.getElementById('searchInput');
+        if (!coursesGrid) return;
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('courses')
+                .select('*');
+
+            if (error) throw error;
+            
+            // เก็บข้อมูลลงตัวแปรกลาง
+            allCourses = data;
+
+            // ฟังก์ชันสำหรับสร้าง HTML ของ Card
+            const renderCourses = (coursesToDisplay) => {
+                coursesGrid.innerHTML = '';
+                if (coursesToDisplay.length > 0) {
+                    coursesToDisplay.forEach(course => {
+                        coursesGrid.innerHTML += `
+                            <div class="col-lg-4 col-md-6 course-card-item">
+                                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                    <div class="bg-primary text-white d-flex align-items-center justify-content-center" style="height: 160px; background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
+                                        <i class="display-3">📖</i>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <h5 class="card-title fw-bold mb-3">${course.course_name}</h5>
+                                        <p class="card-text text-muted small">ยกระดับทักษะของคุณด้วยหลักสูตรที่ออกแบบมาเพื่ออนาคต</p>
+                                        <div class="d-grid mt-4">
+                                            <button class="btn btn-primary rounded-pill fw-bold" onclick="enrollCourse('${course.course_name}')">
+                                                ลงทะเบียนเรียน
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    coursesGrid.innerHTML = '<div class="col-12 text-center text-muted my-5">ไม่พบชื่อคอร์สที่คุณค้นหา...</div>';
+                }
+            };
+
+            // แสดงผลครั้งแรก
+            renderCourses(allCourses);
+
+            // ระบบค้นหา Real-time
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filtered = allCourses.filter(course => 
+                        course.course_name.toLowerCase().includes(searchTerm)
+                    );
+                    renderCourses(filtered);
+                });
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    loadCoursesGrid();
+
     // ==========================================
     // 6. จัดการหน้าแอดมิน (admin.html)
     // ==========================================
