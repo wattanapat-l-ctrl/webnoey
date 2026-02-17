@@ -61,46 +61,22 @@
             </div>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">รายชื่อผู้สมัครเรียนล่าสุด</h5>
-            </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-primary text-white fw-bold">รายชื่อผู้สมัครเรียนล่าสุด</div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
                         <tr>
                             <th>ชื่อ-นามสกุล</th>
                             <th>อีเมล</th>
                             <th>คอร์สที่สมัคร</th>
+                            <th>วันที่สมัคร</th>
                         </tr>
                     </thead>
-                    <tbody id="adminTableBody">
-                        </tbody>
+                    <tbody id="enrollmentTableBody">
+                        <tr><td colspan="4" class="text-center text-muted">กำลังโหลดข้อมูล...</td></tr>
+                    </tbody>
                 </table>
-            </div>
-        </div>
-
-        <div class="card shadow-sm mt-4">
-            <div class="card-header bg-info text-dark d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">รายชื่อสมาชิกในระบบ</h5>
-                <span class="badge bg-light text-dark" id="totalUsersCount">กำลังโหลด...</span>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th width="10%">ID</th>
-                                <th>ชื่อ-นามสกุล</th>
-                                <th>ชื่อผู้ใช้ (Username)</th>
-                                <th>อีเมล</th>
-                                <th width="15%">สิทธิ์ใช้งาน</th>
-                            </tr>
-                        </thead>
-                        <tbody id="registeredUsersTableBody">
-                            </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
