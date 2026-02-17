@@ -1,40 +1,26 @@
 const supabaseUrl = 'https://uynzvfiijhuytgjoaaoi.supabase.co'; 
 const supabaseKey = 'sb_publishable_SCzdlhWZGxDYtFL8GTc8MA_H6iSup8-'; 
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-// ตัวแปร Global สำหรับเก็บคอร์สที่เลือก
 let selectedCourseName = ""; 
-
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- 1. จัดการสถานะการเข้าสู่ระบบ (ดึงข้อมูล User ไว้บนสุด) ---
     const userJson = localStorage.getItem('user');
     const loggedInUser = userJson ? JSON.parse(userJson) : null;
-
     const navLogin = document.getElementById('navLogin');
     const navRegister = document.getElementById('navRegister');
     const navUserDropdown = document.getElementById('navUserDropdown');
     const navWelcome = document.getElementById('navWelcome');
     const navAdmin = document.getElementById('navAdmin');
     const navLogoutAction = document.getElementById('navLogoutAction');
-
     if (loggedInUser) {
-        // 1. ซ่อนปุ่มเข้าสู่ระบบและสมัครสมาชิก
         if (navLogin) navLogin.classList.add('d-none');
         if (navRegister) navRegister.classList.add('d-none');
-        
-        // 2. แสดง Dropdown และชื่อผู้ใช้
         if (navUserDropdown) {
             navUserDropdown.classList.remove('d-none');
             navWelcome.textContent = `คุณ ${loggedInUser.fullname}`;
         }
-
-        // 3. แสดงปุ่ม Admin หากเป็น admin
         if (loggedInUser.role === 'admin' && navAdmin) {
             navAdmin.classList.remove('d-none');
         }
-
-        // 4. ตั้งค่าปุ่มออกจากระบบ
         if (navLogoutAction) {
             navLogoutAction.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -43,26 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'index.html';
             });
         }
-
-        // 5. โหลดข้อมูล "คอร์สเรียนของฉัน" เมื่อเปิด Modal
         const myCoursesModal = document.getElementById('myCoursesModal');
         if (myCoursesModal) {
             myCoursesModal.addEventListener('show.bs.modal', loadMyCourses);
         }
     }
-
-    // ฟังก์ชันดึงข้อมูลคอร์สที่ผู้ใช้สมัคร
     async function loadMyCourses() {
         const listContainer = document.getElementById('myCoursesList');
         if (!listContainer || !loggedInUser) return;
-
         listContainer.innerHTML = '<li class="list-group-item text-center py-3">กำลังโหลด...</li>';
-
         const { data, error } = await supabaseClient
             .from('enrollments')
             .select('course_name, enroll_date')
             .eq('email', loggedInUser.email);
-
         if (data && data.length > 0) {
             listContainer.innerHTML = data.map(item => `
                 <li class="list-group-item py-3">
@@ -74,13 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
             listContainer.innerHTML = '<li class="list-group-item text-center py-3">คุณยังไม่ได้สมัครคอร์สใดๆ</li>';
         }
     }
-
-    // --- 2. ระบบป้องกันสิทธิ์ ---
     if (window.location.pathname.includes('courses.html') && !loggedInUser) {
         alert('กรุณาเข้าสู่ระบบก่อนสมัครคอร์สเรียนครับ');
         window.location.href = 'login.html';
     }
-
     if (window.location.pathname.includes('admin.html')) {
         if (!loggedInUser || loggedInUser.role !== 'admin') {
             alert('เฉพาะ Admin เท่านั้นที่เข้าถึงหน้านี้ได้');
@@ -91,8 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
             loadRegisteredUsers();
         }
     }
-
-    // --- 3. ระบบสมัครสมาชิก ---
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', async function(e) {
@@ -102,16 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-
             if (password !== confirmPassword) {
                 alert('รหัสผ่านไม่ตรงกัน!');
                 return;
             }
-
             const { error } = await supabaseClient
                 .from('users')
                 .insert([{ email, fullname, username, password, role: 'user' }]);
-
             if (error) alert('เกิดข้อผิดพลาด: ' + error.message);
             else {
                 alert('สมัครสมาชิกสำเร็จ!');
@@ -119,21 +90,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // --- 4. ระบบเข้าสู่ระบบ ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const usernameInput = document.getElementById('loginUsername').value;
             const passwordInput = document.getElementById('loginPassword').value;
-
             const { data, error } = await supabaseClient
                 .from('users')
                 .select('*')
                 .eq('username', usernameInput)
                 .eq('password', passwordInput);
-
             if (data && data.length > 0) {
                 localStorage.setItem('user', JSON.stringify(data[0]));
                 alert('เข้าสู่ระบบสำเร็จ!');
@@ -143,12 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // --- 5. ระบบคอร์สเรียน (หน้า Grid) ---
     window.loadCoursesGrid = async function() {
         const coursesGrid = document.getElementById('coursesGrid');
         if (!coursesGrid) return;
-
         const { data, error } = await supabaseClient.from('courses').select('*');
         if (data) {
             coursesGrid.innerHTML = data.map(course => `
@@ -166,8 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     if (document.getElementById('coursesGrid')) loadCoursesGrid();
-
-    // --- 6. ระบบลงทะเบียน (Enrollment) ---
     window.enrollCourse = function(courseName) {
         if (!loggedInUser) {
             alert("กรุณาเข้าสู่ระบบก่อนครับ");
@@ -180,14 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modalUserEmail').value = loggedInUser.email;
         new bootstrap.Modal(document.getElementById('enrollModal')).show();
     };
-
     window.confirmEnroll = async function() {
         const phone = document.getElementById('modalUserPhone').value;
         if (!phone || phone.length < 9) {
             alert("กรุณากรอกเบอร์โทรศัพท์");
             return;
         }
-
         const { error } = await supabaseClient.from('enrollments').insert([{ 
             user_id: loggedInUser.id, 
             course_name: selectedCourseName,
@@ -195,15 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
             email: loggedInUser.email,
             phone: phone
         }]);
-
         if (error) alert(error.message);
         else {
             alert("ลงทะเบียนสำเร็จ!");
             bootstrap.Modal.getInstance(document.getElementById('enrollModal')).hide();
         }
     };
-
-    // --- 7. ส่วนงาน Admin (หน้า admin.html) ---
     async function loadCoursesAdmin() {
         const tableBody = document.getElementById('courseManageTableBody');
         if (!tableBody) return;
@@ -217,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>`).join('');
         }
     }
-
     const courseForm = document.getElementById('courseManageForm');
     if (courseForm) {
         courseForm.addEventListener('submit', async (e) => {
@@ -231,14 +187,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
     window.deleteCourse = async (id) => {
         if (confirm("ยืนยันการลบ?")) {
             await supabaseClient.from('courses').delete().eq('id', id);
             loadCoursesAdmin();
         }
     };
-
     async function loadRegisteredUsers() {
         const body = document.getElementById('registeredUsersTableBody');
         if (!body) return;
@@ -247,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
             body.innerHTML = data.map((u, i) => `<tr><td>${i+1}</td><td>${u.fullname}</td><td>${u.email}</td><td>${u.role}</td></tr>`).join('');
         }
     }
-
     async function loadEnrollments() {
         const body = document.getElementById('enrollmentTableBody');
         if (!body) return;
