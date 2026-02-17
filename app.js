@@ -13,29 +13,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const navLogin = document.getElementById('navLogin');
     const navRegister = document.getElementById('navRegister');
-    const navLogout = document.getElementById('navLogout');
+    const navUserDropdown = document.getElementById('navUserDropdown');
     const navWelcome = document.getElementById('navWelcome');
     const navAdmin = document.getElementById('navAdmin');
+    const navLogoutAction = document.getElementById('navLogoutAction');
 
     if (loggedInUser) {
-        if (navLogin) navLogin.style.display = 'none';
-        if (navRegister) navRegister.style.display = 'none';
+        // 1. ซ่อนปุ่มเข้าสู่ระบบและสมัครสมาชิก
+        if (navLogin) navLogin.classList.add('d-none');
+        if (navRegister) navRegister.classList.add('d-none');
         
-        if (navWelcome) {
-            navWelcome.style.display = 'block';
+        // 2. แสดง Dropdown และชื่อผู้ใช้
+        if (navUserDropdown) {
+            navUserDropdown.classList.remove('d-none');
             navWelcome.textContent = `คุณ ${loggedInUser.fullname}`;
         }
-        if (navLogout) {
-            navLogout.style.display = 'block';
-            navLogout.addEventListener('click', function(e) {
+
+        // 3. แสดงปุ่ม Admin หากเป็น admin
+        if (loggedInUser.role === 'admin' && navAdmin) {
+            navAdmin.classList.remove('d-none');
+        }
+
+        // 4. ตั้งค่าปุ่มออกจากระบบ
+        if (navLogoutAction) {
+            navLogoutAction.addEventListener('click', (e) => {
                 e.preventDefault();
                 localStorage.removeItem('user');
-                alert('ออกจากระบบเรียบร้อยแล้วครับ');
+                alert('ออกจากระบบเรียบร้อยแล้ว');
                 window.location.href = 'index.html';
             });
         }
-        if (loggedInUser.role === 'admin' && navAdmin) {
-            navAdmin.style.display = 'block';
+
+        // 5. โหลดข้อมูล "คอร์สเรียนของฉัน" เมื่อเปิด Modal
+        const myCoursesModal = document.getElementById('myCoursesModal');
+        if (myCoursesModal) {
+            myCoursesModal.addEventListener('show.bs.modal', loadMyCourses);
+        }
+    }
+
+    // ฟังก์ชันดึงข้อมูลคอร์สที่ผู้ใช้สมัคร
+    async function loadMyCourses() {
+        const listContainer = document.getElementById('myCoursesList');
+        if (!listContainer || !loggedInUser) return;
+
+        listContainer.innerHTML = '<li class="list-group-item text-center py-3">กำลังโหลด...</li>';
+
+        const { data, error } = await supabaseClient
+            .from('enrollments')
+            .select('course_name, enroll_date')
+            .eq('email', loggedInUser.email);
+
+        if (data && data.length > 0) {
+            listContainer.innerHTML = data.map(item => `
+                <li class="list-group-item py-3">
+                    <div class="fw-bold text-primary">${item.course_name}</div>
+                    <small class="text-muted">วันที่สมัคร: ${new Date(item.enroll_date).toLocaleDateString('th-TH')}</small>
+                </li>
+            `).join('');
+        } else {
+            listContainer.innerHTML = '<li class="list-group-item text-center py-3">คุณยังไม่ได้สมัครคอร์สใดๆ</li>';
         }
     }
 
