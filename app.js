@@ -1,27 +1,17 @@
-// ==========================================
-// 1. ตั้งค่าการเชื่อมต่อ Supabase
-// ==========================================
 const supabaseUrl = 'https://uynzvfiijhuytgjoaaoi.supabase.co'; 
 const supabaseKey = 'sb_publishable_SCzdlhWZGxDYtFL8GTc8MA_H6iSup8-'; 
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ==========================================
-    // 2. ระบบ Session และจัดการ Navbar
-    // ==========================================
-    // ดึงข้อมูลผู้ใช้จาก localStorage
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
 
-    // ดึงตัวแปรเมนูต่างๆ จาก Navbar
-    // ดึงตัวแปรเมนูต่างๆ จาก Navbar
     const navLogin = document.getElementById('navLogin');
     const navRegister = document.getElementById('navRegister');
     const navLogout = document.getElementById('navLogout');
     const navWelcome = document.getElementById('navWelcome');
     const navAdmin = document.getElementById('navAdmin'); // เพิ่มตัวแปรปุ่มแอดมิน
 
-    // ตรวจสอบและเปลี่ยนเมนู Navbar ตามสถานะการล็อกอิน
     if (loggedInUser) {
         // ถ้าเข้าสู่ระบบแล้ว ให้ซ่อน เข้าสู่ระบบ/สมัครสมาชิก
         if (navLogin) navLogin.style.display = 'none';
@@ -42,21 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- ส่วนที่เพิ่มใหม่: ตรวจสอบว่าเป็น Admin หรือไม่ ---
         if (loggedInUser.role === 'admin' && navAdmin) {
             navAdmin.style.display = 'block'; // แสดงปุ่มแอดมินถ้า role เป็น admin
         }
     }
 
-    // ป้องกันคนยังไม่ล็อกอินแอบเข้าหน้าคอร์สเรียน
     if (window.location.pathname.includes('courses.html') && !loggedInUser) {
         alert('กรุณาเข้าสู่ระบบก่อนสมัครคอร์สเรียนครับ');
         window.location.href = 'login.html';
     }
 
-    // ==========================================
-    // 3. จัดการหน้าสมัครสมาชิก (register.html)
-    // ==========================================
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', async function(e) {
@@ -87,9 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 4. จัดการหน้าเข้าสู่ระบบ (login.html)
-    // ==========================================
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
@@ -114,12 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // 5. จัดการหน้าสมัครคอร์สเรียน (courses.html)
-    // ==========================================
-    // ==========================================
-    // จัดการหน้าสมัครคอร์สเรียน (courses.html)
-    // ==========================================
     const courseForm = document.getElementById('courseForm');
     const courseSelect = document.getElementById('courseSelect'); // ดึง dropdown
     
@@ -171,8 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ฟังก์ชันโหลดคอร์สเรียนแบบ Grid Block
-    // ตัวแปรสำหรับเก็บข้อมูลคอร์สทั้งหมดไว้กรองค้นหา
     let allCourses = [];
 
     window.loadCoursesGrid = async function() {
@@ -187,10 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (error) throw error;
             
-            // เก็บข้อมูลลงตัวแปรกลาง
             allCourses = data;
 
-            // ฟังก์ชันสำหรับสร้าง HTML ของ Card
             const renderCourses = (coursesToDisplay) => {
                 coursesGrid.innerHTML = '';
                 if (coursesToDisplay.length > 0) {
@@ -219,10 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
 
-            // แสดงผลครั้งแรก
             renderCourses(allCourses);
 
-            // ระบบค้นหา Real-time
             if (searchInput) {
                 searchInput.addEventListener('input', (e) => {
                     const searchTerm = e.target.value.toLowerCase();
@@ -240,17 +210,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadCoursesGrid();
 
-    // ==========================================
-    // 6. จัดการหน้าแอดมิน (admin.html)
-    // ==========================================
-    // ==========================================
-    // จัดการระบบ เพิ่ม/แก้ไข/ลบ คอร์สเรียน (admin.html)
-    // ==========================================
     const courseManageForm = document.getElementById('courseManageForm');
     const courseManageTableBody = document.getElementById('courseManageTableBody');
     
     if (courseManageTableBody) {
-        // 1. ฟังก์ชันโหลดรายชื่อบทเรียน
         window.loadManageCourses = async function() {
             const { data, error } = await supabaseClient.from('courses').select('*').order('id', { ascending: true });
             courseManageTableBody.innerHTML = '';
@@ -271,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         loadManageCourses(); // เรียกใช้งานเมื่อเปิดหน้าแอดมิน
 
-        // 2. ฟังก์ชันเมื่อกดปุ่ม "ลบ"
         window.deleteCourse = async function(id) {
             if (confirm('คุณแน่ใจหรือไม่ที่จะลบบทเรียนนี้?')) {
                 await supabaseClient.from('courses').delete().eq('id', id);
@@ -280,7 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // 3. ฟังก์ชันเมื่อกดปุ่ม "แก้ไข"
         window.editCourse = function(id, name) {
             document.getElementById('editCourseId').value = id;
             document.getElementById('inputCourseName').value = name;
@@ -290,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('cancelEditBtn').style.display = 'block';
         };
 
-        // 4. ฟังก์ชันเมื่อกดยกเลิกการแก้ไข
         document.getElementById('cancelEditBtn').addEventListener('click', () => {
             courseManageForm.reset();
             document.getElementById('editCourseId').value = '';
@@ -300,7 +260,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('cancelEditBtn').style.display = 'none';
         });
 
-        // 5. บันทึก หรือ อัปเดต ข้อมูลเมื่อกด Submit
         courseManageForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editCourseId').value;
@@ -321,17 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ==========================================
-    // จัดการระบบตารางสมาชิก (admin.html)
-    // ==========================================
     const registeredUsersTableBody = document.getElementById('registeredUsersTableBody');
     const totalUsersCount = document.getElementById('totalUsersCount');
     
     if (registeredUsersTableBody) {
-        // ฟังก์ชันโหลดรายชื่อสมาชิกทั้งหมดจากตาราง users
         window.loadRegisteredUsers = async function() {
             try {
-                // ดึงข้อมูลจาก Supabase เรียงตาม ID
                 const { data, error } = await supabaseClient
                     .from('users')
                     .select('*')
@@ -341,17 +295,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (error) throw error;
 
                 if (data && data.length > 0) {
-                    // อัปเดตตัวเลขจำนวนสมาชิกรวม
                     if (totalUsersCount) totalUsersCount.textContent = `รวม ${data.length} บัญชี`;
 
-                    // วนลูปสร้างตาราง
                     data.forEach(user => {
-                        // เช็คสิทธิ์เพื่อใส่ป้ายสีสวยๆ
                         const roleBadge = user.role === 'admin' 
                             ? '<span class="badge bg-danger">Admin</span>' 
                             : '<span class="badge bg-secondary">User</span>';
                         
-                        // เผื่อกรณีที่คุณยังไม่มีคอลัมน์ id ในตาราง users
                         const userId = user.id ? user.id : '-';
 
                         registeredUsersTableBody.innerHTML += `
@@ -374,11 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // เรียกใช้งานทันทีเมื่อโหลดหน้าแอดมิน
         loadRegisteredUsers();
     }
 
-    // ป้องกันคนที่ไม่ใช่ Admin เข้าหน้า admin.html
     if (window.location.pathname.includes('admin.html')) {
         if (!loggedInUser || loggedInUser.role !== 'admin') {
             alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้ครับเฉพาะ Admin เท่านั้น');
