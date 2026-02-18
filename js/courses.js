@@ -85,17 +85,16 @@ window.openEnrollModal = (courseName, price) => {
         return;
     }
 
-    // เก็บค่าลงตัวแปร Global
     selectedCourseName = courseName;
-    selectedCoursePrice = price; 
+    selectedCoursePrice = price;
 
-    // ใส่ข้อมูลลงใน Input ของ Modal
+    // ใส่ค่าลงใน Modal
     document.getElementById('modalCourseName').value = courseName;
-    document.getElementById('modalUserFullname').value = user.fullname;
-    document.getElementById('modalUserEmail').value = user.email;
-    document.getElementById('modalUserPhone').value = ""; // ล้างค่าเบอร์โทรเก่า
+    document.getElementById('modalUserFullname').value = user.fullname || user.username;
     
-    // สั่งเปิด Modal
+    // ตรวจสอบว่าใน user object มี email ไหม ถ้าไม่มีให้ใส่ "-" หรือ "ไม่ได้ระบุ"
+    document.getElementById('modalUserEmail').value = user.email || "ไม่พบข้อมูลอีเมล";
+
     const enrollModal = new bootstrap.Modal(document.getElementById('enrollModal'));
     enrollModal.show();
 };
