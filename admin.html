@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MyCourse Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root { --sidebar-width: 250px; }
+        body { background-color: #f4f7f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* Sidebar Style */
+        .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; background: #212529; color: white; transition: all 0.3s; z-index: 1000; }
+        .sidebar .nav-link { color: rgba(255,255,255,0.7); padding: 12px 20px; border-radius: 0; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: white; background: rgba(255,255,255,0.1); border-left: 4px solid #0d6efd; }
+        
+        /* Main Content Style */
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .stat-card { transition: transform 0.2s; border-left: 5px solid #0d6efd; }
+        .stat-card:hover { transform: translateY(-5px); }
+
+        /* --- ส่วนที่เพิ่ม: จำกัดความสูงตารางให้แสดงประมาณ 6 แถว --- */
+        .table-responsive {
+            max-height: 420px; 
+            overflow-y: auto;
+        }
+        /* ทำให้หัวตารางติดอยู่กับที่เวลาเลื่อน */
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f8f9fa !important;
+            z-index: 10;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
+            .main-content { margin-left: 0; }
+            .sidebar.show { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar d-flex flex-column p-3">
+        <h4 class="text-center mb-4 fw-bold text-primary">MyCourse</h4>
+        <hr>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="#" class="nav-link active"><i class="bi bi-speedometer2 me-2"></i> แผงควบคุม</a>
+            </li>
+            <li>
+                <a href="#section-courses" class="nav-link text-white"><i class="bi bi-book me-2"></i> จัดการคอร์ส</a>
+            </li>
+            <li>
+                <a href="#section-enroll" class="nav-link text-white"><i class="bi bi-people me-2"></i> การสมัครเรียน</a>
+            </li>
+            <li>
+                <a href="#section-users" class="nav-link text-white"><i class="bi bi-person-gear me-2"></i> สมาชิกระบบ</a>
+            </li>
+        </ul>
+        <hr>
+        <a href="index.html" class="btn btn-outline-light btn-sm w-100 mb-2">หน้าเว็บผู้ใช้</a>
+        <button class="btn btn-danger btn-sm w-100" id="navLogout">ออกจากระบบ</button>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Dashboard ภาพรวมระบบ</h2>
+            <span class="text-muted" id="currentDate"></span>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card p-3 border-primary">
+                    <small class="text-muted">จำนวนสมาชิก</small>
+                    <h3 id="userCount" class="fw-bold mb-0">0</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-3 border-success">
+                    <small class="text-muted">คอร์สทั้งหมด</small>
+                    <h3 id="courseCount" class="fw-bold mb-0">0</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-3 border-warning">
+                    <small class="text-muted">รอตรวจสอบยอด</small>
+                    <h3 id="pendingCount" class="fw-bold mb-0">0</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card p-3 border-info">
+                    <small class="text-muted">รายได้รวม (จำลอง)</small>
+                    <h3 id="totalRevenue" class="fw-bold mb-0">฿0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4" id="section-courses">
+                <div class="card">
+                    <div class="card-header bg-white fw-bold py-3"><i class="bi bi-plus-circle me-2"></i>เพิ่มคอร์สใหม่</div>
+                    <div class="card-body">
+                        <form id="courseManageForm">
+                            <div class="mb-3">
+                                <label class="form-label small">ชื่อบทเรียน</label>
+                                <input type="text" id="inputCourseName" class="form-control" required>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-6">
+                                    <label class="form-label small">ราคา (บาท)</label>
+                                    <input type="number" id="inputCoursePrice" class="form-control" value="0">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">หมวดหมู่</label>
+                                    <select class="form-select"><option>Programming</option><option>Design</option></select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small">URL รูปภาพ</label>
+                                <input type="url" id="inputCourseImage" class="form-control" placeholder="https://...">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 shadow-sm">บันทึกข้อมูล</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card p-0 overflow-hidden">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <span class="fw-bold">รายการคอร์สเรียนทั้งหมด</span>
+                        <input type="text" id="searchCourseInput" class="form-control form-control-sm w-50" placeholder="🔍 ค้นหาชื่อคอร์ส...">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr><th>ID</th><th>คอร์ส</th><th>ราคา</th><th class="text-center">จัดการ</th></tr>
+                            </thead>
+                            <tbody id="courseManageTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4" id="section-enroll">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <span class="fw-bold"><i class="bi bi-credit-card me-2"></i> ประวัติการสมัครเรียน</span>
+                <input type="text" id="searchEnrollmentInput" class="form-control form-control-sm w-25" placeholder="🔍 ค้นหาชื่อ/สถานะ...">
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th class="ps-4">ผู้สมัคร</th><th>คอร์ส</th><th>วันที่</th><th>สถานะ</th><th>จัดการ</th></tr>
+                    </thead>
+                    <tbody id="enrollmentTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mt-4" id="section-users">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <span class="fw-bold">จัดการสมาชิกในระบบ</span>
+                <input type="text" id="searchUserInput" class="form-control form-control-sm w-25" placeholder="🔍 ค้นหาชื่อ/อีเมล...">
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th class="ps-4">ชื่อ-นามสกุล</th><th>อีเมล</th><th>บทบาท</th><th class="text-center">จัดการ</th></tr>
+                    </thead>
+                    <tbody id="userTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-plus me-2"></i> เพิ่มตารางเรียน/ลิงก์เข้าเรียน</h5>
+            </div>
+            <div class="card-body">
+                <form id="scheduleManageForm">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">ชื่อคอร์ส</label>
+                            <input type="text" id="schedCourseName" class="form-control" placeholder="เช่น Basic HTML" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">วันเรียน</label>
+                            <input type="text" id="schedDay" class="form-control" placeholder="เช่น จันทร์/พุธ" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">เวลา (เริ่ม - จบ)</label>
+                            <div class="input-group">
+                                <input type="time" id="schedStart" class="form-control" required>
+                                <input type="time" id="schedEnd" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">ลิงก์เข้าเรียน (Zoom/Meet)</label>
+                            <input type="url" id="schedLink" class="form-control" placeholder="https://zoom.us/j/...">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">สถานที่/ห้อง</label>
+                            <input type="text" id="schedRoom" class="form-control" placeholder="Online หรือ ห้องเรียน 101">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-save me-1"></i> บันทึกตารางเรียน</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i> รายการตารางเรียนที่เปิดแล้ว</h5>
+                <input type="text" id="searchScheduleInput" class="form-control form-control-sm w-25" placeholder="🔍 ค้นหาวิชา...">
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ชื่อคอร์ส</th>
+                                <th>วันเรียน</th>
+                                <th>เวลา</th>
+                                <th>สถานที่</th>
+                                <th class="text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">แก้ไขข้อมูลสมาชิก</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+                        <div class="mb-3"><label class="form-label">ชื่อ-นามสกุล</label><input type="text" id="editFullname" class="form-control" required></div>
+                        <div class="mb-3"><label class="form-label">รหัสผ่านใหม่</label><input type="password" id="editPassword" class="form-control"></div>
+                        <button type="submit" class="btn btn-primary w-100">บันทึกการเปลี่ยนแปลง</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/courses.js"></script>
+    <script src="js/admin.js"></script>
+    
+    <script>
+        // แสดงวันที่ปัจจุบัน
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('th-TH', { dateStyle: 'long' });
+
+        // --- ส่วนที่เพิ่ม: ระบบค้นหาสำหรับทุกตาราง ---
+        function setupSearch(inputId, tableBodyId) {
+            document.getElementById(inputId).addEventListener('keyup', function() {
+                const value = this.value.toLowerCase();
+                const rows = document.querySelectorAll(`#${tableBodyId} tr`);
+                
+                rows.forEach(row => {
+                    row.style.display = row.innerText.toLowerCase().includes(value) ? '' : 'none';
+                });
+            });
+        }
+
+        // เรียกใช้งานระบบค้นหา
+        setupSearch('searchCourseInput', 'courseManageTableBody');
+        setupSearch('searchEnrollmentInput', 'enrollmentTableBody');
+        setupSearch('searchUserInput', 'userTableBody');
+        setupSearch('searchScheduleInput', 'scheduleTableBody');
+    </script>
+</body>
+</html>
