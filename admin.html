@@ -1,141 +1,97 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบหลังบ้าน (Admin) - MyCourse</title>
+    <title>Admin - MyCourse</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f8f9fa; font-family: 'system-ui', -apple-system, sans-serif; }
-        .card { border: none; border-radius: 15px; }
-        .card-header { border-radius: 15px 15px 0 0 !important; }
-        .table-responsive { border-radius: 0 0 15px 15px; }
+        body { background-color: #f8f9fa; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="index.html">MyCourse Admin</a>
-            <div class="navbar-nav me-auto">
-                <a class="nav-link" href="index.html">กลับหน้าหลัก (ฝั่งผู้ใช้)</a>
-                <a class="nav-link active" href="admin.html">จัดการระบบ</a>
-            </div>
+            <a class="navbar-brand" href="#">MyCourse Admin</a>
+            <a class="btn btn-sm btn-outline-light" href="index.html">หน้าเว็บผู้ใช้</a>
         </div>
     </nav>
 
-    <div class="container mt-4 mb-5">
-        <h2 class="mb-4 fw-bold text-dark">แผงควบคุมสำหรับผู้ดูแลระบบ (Admin)</h2>
-
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0" id="formTitle"><i class="bi bi-plus-circle me-2"></i>เพิ่มบทเรียนใหม่</h5>
-                    </div>
+    <div class="container pb-5">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">เพิ่มบทเรียน</div>
                     <div class="card-body">
                         <form id="courseManageForm">
-                            <input type="hidden" id="editCourseId">
                             <div class="mb-3">
-                                <label for="inputCourseName" class="form-label">ชื่อบทเรียน</label>
-                                <input type="text" class="form-control" id="inputCourseName" required placeholder="เช่น พื้นฐาน PHP">
+                                <label class="form-label">ชื่อบทเรียน</label>
+                                <input type="text" id="inputCourseName" class="form-control" required>
                             </div>
-                            <button type="submit" class="btn btn-success w-100" id="saveCourseBtn">บันทึกบทเรียน</button>
-                            <button type="button" class="btn btn-secondary w-100 mt-2" id="cancelEditBtn" style="display: none;">ยกเลิกการแก้ไข</button>
+                            <div class="mb-3">
+                                <label class="form-label">ราคา (บาท)</label>
+                                <input type="number" id="inputCoursePrice" class="form-control" value="0">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">บันทึก</button>
                         </form>
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-8 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="mb-0"><i class="bi bi-book me-2"></i>จัดการบทเรียน</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th width="10%" class="ps-3">ID</th>
-                                        <th>ชื่อบทเรียน</th>
-                                        <th width="25%" class="text-center">จัดการ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="courseManageTableBody"></tbody>
-                            </table>
-                        </div>
+            <div class="col-md-8">
+                <div class="card h-100">
+                    <div class="card-header bg-dark text-white">รายการคอร์ส</div>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead><tr><th>ID</th><th>ชื่อ</th><th>ราคา</th><th class="text-center">ลบ</th></tr></thead>
+                            <tbody id="courseManageTableBody"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <hr class="my-5">
-
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-secondary text-white fw-bold d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-people-fill me-2"></i>รายชื่อสมาชิกและการจัดการสิทธิ์</span>
-                <span class="badge bg-light text-dark" id="userCount">0 คน</span>
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-card-checklist me-2"></i>ประวัติการสมัครเรียน</span>
+                <input type="text" id="searchEnrollmentInput" class="form-control form-control-sm w-25" placeholder="ค้นหาชื่อ/วิชา...">
             </div>
             <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
+                <table class="table table-hover mb-0">
                     <thead class="table-light">
-                        <tr>
-                            <th width="8%" class="ps-3">ID</th>
-                            <th>ข้อมูลผู้ใช้</th>
-                            <th>อีเมล</th>
-                            <th>สถานะ</th>
-                            <th width="25%" class="text-center">จัดการสมาชิก</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        <tr><td colspan="5" class="text-center py-4 text-muted">กำลังโหลด...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white fw-bold">
-                <i class="bi bi-card-checklist me-2"></i>ประวัติการลงทะเบียนเรียนล่าสุด
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-3">ชื่อ-นามสกุล</th>
-                            <th>อีเมล</th>
-                            <th>คอร์สที่สมัคร</th>
-                            <th>วันที่สมัคร</th>
-                        </tr>
+                        <tr><th class="ps-3">ชื่อ-นามสกุล</th><th>อีเมล</th><th>คอร์ส</th><th>วันที่</th></tr>
                     </thead>
                     <tbody id="enrollmentTableBody"></tbody>
                 </table>
             </div>
         </div>
+
+        <div class="card">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between">
+                <span>จัดการสมาชิก</span>
+                <span id="userCount" class="badge bg-light text-dark">0</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr><th class="ps-3">Username</th><th>ชื่อ</th><th>อีเมล</th><th>บทบาท</th><th class="text-center">จัดการ</th></tr>
+                    </thead>
+                    <tbody id="userTableBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content border-0 rounded-4 shadow">
-                <div class="modal-header border-0 bg-light">
-                    <h5 class="modal-title fw-bold">แก้ไขข้อมูลสมาชิก</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body p-4">
                     <form id="editUserForm">
                         <input type="hidden" id="editUserId">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">ชื่อ-นามสกุล</label>
-                            <input type="text" class="form-control" id="editFullname" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold text-danger">เปลี่ยนรหัสผ่านใหม่ (ปล่อยว่างถ้าไม่เปลี่ยน)</label>
-                            <input type="password" class="form-control" id="editPassword" placeholder="รหัสผ่านใหม่">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">บันทึกการเปลี่ยนแปลง</button>
+                        <div class="mb-3"><label class="form-label">ชื่อ-นามสกุล</label><input type="text" id="editFullname" class="form-control" required></div>
+                        <div class="mb-3"><label class="form-label">รหัสผ่านใหม่ (ถ้าต้องการเปลี่ยน)</label><input type="password" id="editPassword" class="form-control"></div>
+                        <button type="submit" class="btn btn-primary w-100">บันทึก</button>
                     </form>
                 </div>
             </div>
